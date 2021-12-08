@@ -37,7 +37,7 @@ func hasBingo(bits uint64) bool {
 	return false
 }
 
-func readCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
+func scanCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
 	result, sum, err = make(Card), 0, nil
 	for i := 0; i < height; i++ {
 		if scanner.Scan() {
@@ -64,7 +64,7 @@ func readCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
 	return
 }
 
-func readDraws(scanner *bufio.Scanner) (result []int, err error) {
+func scanDraws(scanner *bufio.Scanner) (result []int, err error) {
 	result, err = make([]int, 0), nil
 	var line string
 	for scanner.Scan() {
@@ -93,7 +93,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	draws, err := readDraws(scanner)
+	draws, err := scanDraws(scanner)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,7 +101,7 @@ func main() {
 	cards := make([]Card, 0, 0)
 	scores := make([]int, 0, 0)
 	for scanner.Scan() {
-		card, score, err := readCard(scanner)
+		card, score, err := scanCard(scanner)
 		if err != nil {
 			log.Fatal(err)
 		}
