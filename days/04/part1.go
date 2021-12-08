@@ -74,8 +74,8 @@ func scanDraws(scanner *bufio.Scanner) (result []int, err error) {
 		}
 	}
 	parts := strings.Split(line, ",")
-	for i := 0; i < len(parts); i++ {
-		num, err := strconv.Atoi(strings.TrimSpace(parts[i]))
+	for _, p := range parts {
+		num, err := strconv.Atoi(strings.TrimSpace(p))
 		if err != nil {
 			return nil, err
 		}
@@ -114,10 +114,9 @@ func main() {
 
 	score := -1
 	bits := make([]uint64, len(cards))
-	for i := 0; i < len(draws); i++ {
-		draw := draws[i]
-		for j := 0; j < len(cards); j++ {
-			coord, hit := cards[j][draw]
+	for _, draw := range draws {
+		for j, card := range cards {
+			coord, hit := card[draw]
 			if hit {
 				scores[j] -= draw
 				bits[j] |= uint64(1) << (coord.row*width + coord.col)

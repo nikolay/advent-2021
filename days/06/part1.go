@@ -30,8 +30,8 @@ func main() {
 
 	parts := strings.Split(line, ",")
 	fish := make(map[int]int)
-	for i := 0; i < len(parts); i++ {
-		num, err := strconv.Atoi(strings.TrimSpace(parts[i]))
+	for _, p := range parts {
+		num, err := strconv.Atoi(strings.TrimSpace(p))
 		if err != nil {
 			log.Fatal(err)
 		}
