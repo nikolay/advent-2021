@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func check(prev, curr, next []rune) (result int) {
+func calcRisk(prev, curr, next []rune) (result int) {
 	for i, c := range curr {
-		checkUp := prev == nil || prev[i] > c
-		checkLeft := i == 0 || curr[i-1] > c
-		checkRight := i == len(curr)-1 || curr[i+1] > c
-		checkDown := next == nil || next[i] > c
-		if checkUp && checkLeft && checkRight && checkDown {
+		up := prev == nil || prev[i] > c
+		left := i == 0 || curr[i-1] > c
+		right := i == len(curr)-1 || curr[i+1] > c
+		down := next == nil || next[i] > c
+		if up && left && right && down {
 			result += int(c-'0') + 1
 		}
 	}
@@ -30,11 +30,10 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	var line string
 	var buffer []string = make([]string, 0, 3)
 	risk := 0
 	for scanner.Scan() {
-		line = strings.TrimSpace(scanner.Text())
+		line := strings.TrimSpace(scanner.Text())
 		if len(line) == 0 {
 			continue
 		}
@@ -54,7 +53,7 @@ func main() {
 		}
 		curr := []rune(buffer[l-2])
 		next := []rune(buffer[l-1])
-		risk += check(prev, curr, next)
+		risk += calcRisk(prev, curr, next)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -63,6 +62,6 @@ func main() {
 	l := len(buffer)
 	prev := []rune(buffer[l-2])
 	curr := []rune(buffer[l-1])
-	risk += check(prev, curr, nil)
+	risk += calcRisk(prev, curr, nil)
 	fmt.Println(risk)
 }
