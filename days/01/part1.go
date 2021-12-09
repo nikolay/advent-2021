@@ -19,14 +19,14 @@ func main() {
 	last := -1
 	count := 0
 	for scanner.Scan() {
-		scan, err := strconv.Atoi(scanner.Text())
+		num, err := strconv.Atoi(scanner.Text())
 		if err != nil {
 			log.Fatal(err)
 		}
-		if last != -1 && scan > last {
+		if last != -1 && num > last {
 			count++
 		}
-		last = scan
+		last = num
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)

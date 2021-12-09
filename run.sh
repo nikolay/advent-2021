@@ -19,7 +19,7 @@ main () {
 	fi
 
 	pushd "./days/$(printf '%02d' ${day})" 1>/dev/null
-	go run "part${part}.go"
+	go run "part${part}.go" "${part}"
 	popd 1>/dev/null
 }
 

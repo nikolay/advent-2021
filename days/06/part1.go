@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -9,9 +10,18 @@ import (
 	"strings"
 )
 
-const days = 80
+var days int
 
 func main() {
+	switch os.Args[1] {
+	case "1":
+		days = 80
+	case "2":
+		days = 256
+	default:
+		log.Fatal(errors.New(fmt.Sprintf("unknown part number %v", os.Args[1])))
+	}
+
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
