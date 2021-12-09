@@ -38,6 +38,9 @@ func main() {
 			break
 		}
 	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 
 	parts := strings.Split(line, ",")
 	positions := make([]int, 0, len(parts))
