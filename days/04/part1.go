@@ -85,6 +85,16 @@ func scanDraws(scanner *bufio.Scanner) (result []int, err error) {
 }
 
 func main() {
+	var firstBingo bool
+	switch os.Args[1] {
+	case "1":
+		firstBingo = true
+	case "2":
+		firstBingo = false
+	default:
+		log.Fatal(errors.New(fmt.Sprintf("unknown part number %v", os.Args[1])))
+	}
+
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -114,15 +124,21 @@ func main() {
 
 	score := -1
 	bits := make([]uint64, len(cards))
+	bingo := make(map[int]bool)
 	for _, draw := range draws {
 		for j, card := range cards {
+			if bingo[j] {
+				continue
+			}
 			coord, hit := card[draw]
 			if hit {
 				scores[j] -= draw
 				bits[j] |= uint64(1) << (coord.row*width + coord.col)
 				if hasBingo(bits[j]) {
-					score = scores[j] * draw
-					break
+					bingo[j] = true
+					if firstBingo || len(bingo) == len(cards) {
+						score = scores[j] * draw
+					}
 				}
 			}
 		}

@@ -10,9 +10,8 @@ import (
 	"strings"
 )
 
-var days int
-
 func main() {
+	var days int
 	switch os.Args[1] {
 	case "1":
 		days = 80
