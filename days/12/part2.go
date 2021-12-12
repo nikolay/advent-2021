@@ -46,7 +46,6 @@ func findPaths(caves map[string][]string, queue []string, current string, end st
 	for _, next := range caves[current] {
 		if next == end {
 			path := append(queue, next)
-			//			fmt.Println(strings.Join(path, ","))
 			result = append(result, path)
 		} else if isUpper(next) || next != "start" && next != "end" && isLower(next) && canBeVisited(queue, next) {
 			result = append(result, findPaths(caves, append(queue, next), next, end)...)
