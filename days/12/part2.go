@@ -47,7 +47,7 @@ func findPaths(caves map[string][]string, queue []string, current string, end st
 		if next == end {
 			path := append(queue, next)
 			result = append(result, path)
-		} else if isUpper(next) || next != "start" && next != "end" && isLower(next) && canBeVisited(queue, next) {
+		} else if isUpper(next) || isLower(next) && canBeVisited(queue, next) {
 			result = append(result, findPaths(caves, append(queue, next), next, end)...)
 		}
 	}
