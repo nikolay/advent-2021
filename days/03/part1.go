@@ -15,10 +15,10 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
 	count := uint(0)
 	freq := make([]uint, 0, 64)
 	bitSize := int(0)
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		bits := scanner.Text()
 		if bitSize == 0 {

@@ -19,8 +19,8 @@ func main() {
 
 	r := regexp.MustCompile(`^(forward|up|down) (\d+)$`)
 
-	scanner := bufio.NewScanner(file)
 	x, aim, depth := 0, 0, 0
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		cmd := scanner.Text()
 		matches := r.FindStringSubmatch(cmd)

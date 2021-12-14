@@ -111,22 +111,10 @@ func main() {
 		if len(matches) == 0 {
 			log.Fatal(errors.New(fmt.Sprintf("invalid command: %v", cmd)))
 		}
-		x1, err := strconv.Atoi(matches[1])
-		if err != nil {
-			log.Fatal(err)
-		}
-		y1, err := strconv.Atoi(matches[2])
-		if err != nil {
-			log.Fatal(err)
-		}
-		x2, err := strconv.Atoi(matches[3])
-		if err != nil {
-			log.Fatal(err)
-		}
-		y2, err := strconv.Atoi(matches[4])
-		if err != nil {
-			log.Fatal(err)
-		}
+		x1, _ := strconv.Atoi(matches[1])
+		y1, _ := strconv.Atoi(matches[2])
+		x2, _ := strconv.Atoi(matches[3])
+		y2, _ := strconv.Atoi(matches[4])
 		line := Line{Point{x1, y1}, Point{x2, y2}}
 		if line.IsHorizontal() || line.IsVertical() {
 			lines = append(lines, line)

@@ -48,9 +48,9 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
 	matrix := make([][]bool, 0)
 	width, height := 0, 0
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if len(line) == 0 {

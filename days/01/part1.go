@@ -15,9 +15,9 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
 	last := -1
 	count := 0
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		num, err := strconv.Atoi(scanner.Text())
 		if err != nil {

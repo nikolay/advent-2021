@@ -102,7 +102,6 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-
 	draws, err := scanDraws(scanner)
 	if err != nil {
 		log.Fatal(err)

@@ -47,19 +47,19 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
 	formula := ""
 	rules := make(map[string]string)
+	scanner := bufio.NewScanner(file)
 	if scanner.Scan() {
 		formula = strings.TrimSpace(scanner.Text())
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			if len(line) == 0 {
-				continue
-			}
-			parts := strings.Split(line, " -> ")
-			rules[parts[0]] = parts[1]
+	}
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if len(line) == 0 {
+			continue
 		}
+		parts := strings.Split(line, " -> ")
+		rules[parts[0]] = parts[1]
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
