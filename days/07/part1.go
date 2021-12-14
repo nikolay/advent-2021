@@ -44,25 +44,17 @@ func main() {
 
 	parts := strings.Split(line, ",")
 	positions := make([]int, 0, len(parts))
-	min, max := 0, 0
-	for i, p := range parts {
+	for _, p := range parts {
 		num, err := strconv.Atoi(strings.TrimSpace(p))
 		if err != nil {
 			log.Fatal(err)
-		}
-		if i == 0 {
-			min, max = num, num
-		} else if num < min {
-			min = num
-		} else if num > max {
-			max = num
 		}
 		positions = append(positions, num)
 	}
 
 	minFuel := -1
-	for i := min; i <= max; i++ {
-		fuel := calcFuel(positions, i)
+	for _, p := range positions {
+		fuel := calcFuel(positions, p)
 		if minFuel == -1 || fuel < minFuel {
 			minFuel = fuel
 		}

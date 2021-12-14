@@ -64,6 +64,6 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Part 1 Result:", polymer(formula, rules, 10))
-	fmt.Println("Part 2 Result:", polymer(formula, rules, 40))
+	fmt.Println("Part 1", "=", polymer(formula, rules, 10))
+	fmt.Println("Part 2", "=", polymer(formula, rules, 40))
 }
