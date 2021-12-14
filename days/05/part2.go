@@ -80,8 +80,8 @@ func main() {
 
 	r := regexp.MustCompile(`^(\d+),(\d+) -> (\d+),(\d+)$`)
 
-	scanner := bufio.NewScanner(file)
 	lines := make([]Line, 0, 0)
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		cmd := scanner.Text()
 		matches := r.FindStringSubmatch(cmd)

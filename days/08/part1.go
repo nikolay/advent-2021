@@ -15,9 +15,8 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-
 	count := 0
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if len(line) == 0 {
@@ -37,7 +36,7 @@ func main() {
 			case 7:
 				d = 8
 			}
-			if d != -1 {
+			if d < 0 {
 				count++
 			}
 		}

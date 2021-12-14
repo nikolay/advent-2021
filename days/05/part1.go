@@ -37,25 +37,25 @@ func max(a, b int) int {
 	return b
 }
 
-func (l Line) isVertical() bool {
+func (l Line) IsVertical() bool {
 	return l.a.x == l.b.x
 }
 
-func (l Line) isHorizontal() bool {
+func (l Line) IsHorizontal() bool {
 	return l.a.y == l.b.y
 }
 
-func (l *Line) normalize() *Line {
-	if l.isVertical() && (l.a.y > l.b.y) || l.isHorizontal() && (l.a.x > l.b.x) {
+func (l *Line) Normalize() *Line {
+	if l.IsVertical() && (l.a.y > l.b.y) || l.IsHorizontal() && (l.a.x > l.b.x) {
 		return &Line{l.b, l.a}
 	} else {
 		return l
 	}
 }
 
-func (l Line) cross(m Line) (result []Point) {
-	l1, m1 := l.normalize(), m.normalize()
-	if l1.isVertical() && m1.isVertical() {
+func (l Line) Cross(m Line) (result []Point) {
+	l1, m1 := l.Normalize(), m.Normalize()
+	if l1.IsVertical() && m1.IsVertical() {
 		if l1.a.y > m1.a.y {
 			l1, m1 = m1, l1
 		}
@@ -69,7 +69,7 @@ func (l Line) cross(m Line) (result []Point) {
 				return
 			}
 		}
-	} else if l1.isHorizontal() && m1.isHorizontal() {
+	} else if l1.IsHorizontal() && m1.IsHorizontal() {
 		if l1.a.x > m1.a.x {
 			l1, m1 = m1, l1
 		}
@@ -84,7 +84,7 @@ func (l Line) cross(m Line) (result []Point) {
 			}
 		}
 	} else {
-		if l1.isVertical() {
+		if l1.IsVertical() {
 			l1, m1 = m1, l1
 		}
 		if l1.a.x <= m1.a.x && l1.b.x >= m1.a.x && m1.a.y <= l1.a.y && m1.b.y >= l1.b.y {
@@ -103,8 +103,8 @@ func main() {
 
 	r := regexp.MustCompile(`^(\d+),(\d+) -> (\d+),(\d+)$`)
 
-	scanner := bufio.NewScanner(file)
 	lines := make([]Line, 0, 0)
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		cmd := scanner.Text()
 		matches := r.FindStringSubmatch(cmd)
@@ -128,7 +128,7 @@ func main() {
 			log.Fatal(err)
 		}
 		line := Line{Point{x1, y1}, Point{x2, y2}}
-		if line.isHorizontal() || line.isVertical() {
+		if line.IsHorizontal() || line.IsVertical() {
 			lines = append(lines, line)
 		}
 	}
@@ -139,7 +139,7 @@ func main() {
 	points := make([]Point, 0, 0)
 	for i := 0; i < len(lines)-1; i++ {
 		for j := i + 1; j < len(lines); j++ {
-			cross := lines[i].cross(lines[j])
+			cross := lines[i].Cross(lines[j])
 			if cross != nil && len(cross) > 0 {
 				points = append(points, cross...)
 			}
