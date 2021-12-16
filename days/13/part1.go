@@ -57,14 +57,8 @@ func main() {
 			break
 		}
 		coords := strings.Split(line, ",")
-		x, e1 := strconv.Atoi(coords[0])
-		if e1 != nil {
-			log.Fatal(e1)
-		}
-		y, e2 := strconv.Atoi(coords[1])
-		if e2 != nil {
-			log.Fatal(e2)
-		}
+		x, _ := strconv.Atoi(coords[0])
+		y, _ := strconv.Atoi(coords[1])
 		if height < y+1 {
 			height = y + 1
 			matrix = expandMatrix(matrix, width, height)
@@ -82,10 +76,7 @@ func main() {
 			break
 		}
 		if strings.HasPrefix(line, "fold along y=") {
-			foldY, err := strconv.Atoi(strings.TrimPrefix(line, "fold along y="))
-			if err != nil {
-				log.Fatal(err)
-			}
+			foldY, _ := strconv.Atoi(strings.TrimPrefix(line, "fold along y="))
 			newHeight := max(foldY, height-1-foldY)
 			newMatrix := expandMatrix([][]bool{}, width, newHeight)
 			for y := 0; y < newHeight; y++ {
@@ -98,10 +89,7 @@ func main() {
 			matrix = newMatrix
 		}
 		if strings.HasPrefix(line, "fold along x=") {
-			foldX, err := strconv.Atoi(strings.TrimPrefix(line, "fold along x="))
-			if err != nil {
-				log.Fatal(err)
-			}
+			foldX, _ := strconv.Atoi(strings.TrimPrefix(line, "fold along x="))
 			newWidth := max(foldX, width-1-foldX)
 			newMatrix := expandMatrix([][]bool{}, newWidth, height)
 			for x := 0; x < newWidth; x++ {

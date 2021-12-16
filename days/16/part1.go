@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -10,22 +11,10 @@ import (
 
 func hexToBin(s string) (result string) {
 	tans := map[rune]string{
-		'0': "0000",
-		'1': "0001",
-		'2': "0010",
-		'3': "0011",
-		'4': "0100",
-		'5': "0101",
-		'6': "0110",
-		'7': "0111",
-		'8': "1000",
-		'9': "1001",
-		'A': "1010",
-		'B': "1011",
-		'C': "1100",
-		'D': "1101",
-		'E': "1110",
-		'F': "1111",
+		'0': "0000", '1': "0001", '2': "0010", '3': "0011",
+		'4': "0100", '5': "0101", '6': "0110", '7': "0111",
+		'8': "1000", '9': "1001", 'A': "1010", 'B': "1011",
+		'C': "1100", 'D': "1101", 'E': "1110", 'F': "1111",
 	}
 	for _, r := range s {
 		result += tans[r]
@@ -34,7 +23,7 @@ func hexToBin(s string) (result string) {
 }
 
 type Literal struct {
-	literal int64
+	value int64
 }
 
 type Operator struct {
@@ -116,7 +105,7 @@ func calc(p *Packet) (result int64) {
 		return
 	}
 	if p.literal != nil {
-		result = p.literal.literal
+		result = p.literal.value
 	} else if p.operator != nil {
 		for i, op := range p.operator.operands {
 			value := calc(op)
@@ -202,12 +191,14 @@ func main() {
 		if len(line) == 0 {
 			continue
 		}
+		var result int64
 		packet := parsePacket(hexToBin(line), new(int))
 		if part == 1 {
-			println(sumVersions(packet))
+			result = sumVersions(packet)
 		} else {
-			println(calc(packet))
+			result = calc(packet)
 		}
+		fmt.Println(result)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
