@@ -2,12 +2,12 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-usage () {
+usage() {
 	echo "USAGE: $0 <day> <part>"
 	exit 1
 }
 
-main () {
+main() {
 	if [ $# != 2 ]; then
 		usage
 	fi
@@ -18,7 +18,7 @@ main () {
 		usage
 	fi
 
-	pushd "./days/$(printf '%02d' ${day})" 1>/dev/null
+	pushd "./$(date +%Y)/$(printf '%02d' ${day})" 1>/dev/null
 	go run "part${part}.go" "${part}"
 	popd 1>/dev/null
 }
