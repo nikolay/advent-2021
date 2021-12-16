@@ -38,6 +38,7 @@ type Literal struct {
 }
 
 type Operator struct {
+	typeID   int64
 	operands []*Packet
 }
 
@@ -47,102 +48,168 @@ type Packet struct {
 	operator *Operator
 }
 
-func parseLiteral(s string, pos int) (result Literal, i int) {
-	i = pos
-	n := ""
+func chomp(s string, pos *int, size int) string {
+	i := *pos
+	(*pos) += size
+	return s[i:*pos]
+}
+
+func parseLiteral(s string, pos *int) *Literal {
+	bits := ""
 	for {
-		bits := s[i : i+5]
-		i += 5
-		n += bits[1:]
-		if bits[0] == '0' {
+		flag := chomp(s, pos, 1)
+		bits += chomp(s, pos, 4)
+		if flag == "0" {
 			break
 		}
 	}
-	result.literal, _ = strconv.ParseInt(n, 2, 64)
-	return
+	number, _ := strconv.ParseInt(bits, 2, 64)
+	return &Literal{number}
 }
 
-func parseOperator(s string, pos int) (result Operator, i int) {
-	i = pos
-	lengthTypeID := s[i : i+1]
-	i++
-	if lengthTypeID == "0" {
-		totalLength, _ := strconv.ParseInt(s[i:i+15], 2, 64)
-		i += 15
-		endPos := i + int(totalLength)
-		result.operands = make([]*Packet, 0)
-		for i < endPos {
-			var packet Packet
-			packet, i = parsePacket(s, i)
-			result.operands = append(result.operands, &packet)
+func parseOperator(s string, pos *int, typeID int64) *Operator {
+	operator := Operator{typeID, nil}
+	if chomp(s, pos, 1) == "0" {
+		totalLength, _ := strconv.ParseInt(chomp(s, pos, 15), 2, 64)
+		endPos := *pos + int(totalLength)
+		operator.operands = make([]*Packet, 0)
+		for *pos < endPos {
+			operator.operands = append(operator.operands, parsePacket(s, pos))
 		}
-	} else if lengthTypeID == "1" {
-		numberOfSubpackets, _ := strconv.ParseInt(s[i:i+11], 2, 64)
-		i += 11
-		result.operands = make([]*Packet, numberOfSubpackets)
-		for j := int64(0); j < numberOfSubpackets; j++ {
-			var subpacket Packet
-			subpacket, i = parsePacket(s, i)
-			result.operands[j] = &subpacket
+	} else {
+		numberOfSubpackets, _ := strconv.ParseInt(chomp(s, pos, 11), 2, 64)
+		operator.operands = make([]*Packet, numberOfSubpackets)
+		for i := range operator.operands {
+			operator.operands[i] = parsePacket(s, pos)
 		}
 	}
-	return
+	return &operator
 }
 
-func parsePacket(s string, pos int) (result Packet, i int) {
-	i = pos
-	result.version, _ = strconv.ParseInt(s[i:i+3], 2, 64)
-	i += 3
-	typeID, _ := strconv.ParseInt(s[i:i+3], 2, 64)
-	i += 3
-	switch typeID {
-	case 4:
-		var literal Literal
-		result.literal = &literal
-		literal, i = parseLiteral(s, i)
-		break
-	default:
-		var operator Operator
-		result.operator = &operator
-		operator, i = parseOperator(s, i)
+func parsePacket(s string, pos *int) *Packet {
+	packet := Packet{}
+	packet.version, _ = strconv.ParseInt(chomp(s, pos, 3), 2, 64)
+	typeID, _ := strconv.ParseInt(chomp(s, pos, 3), 2, 64)
+	if typeID == 4 {
+		packet.literal = parseLiteral(s, pos)
+	} else {
+		packet.operator = parseOperator(s, pos, typeID)
 	}
-	return
+	return &packet
 }
 
-func calcVersionSums(p *Packet) (result int64) {
+func sumVersions(p *Packet) (result int64) {
 	if p == nil {
 		return
 	}
 	result = p.version
 	if p.operator != nil {
 		for _, op := range p.operator.operands {
-			result += calcVersionSums(op)
+			result += sumVersions(op)
+		}
+	}
+	return
+}
+
+func calc(p *Packet) (result int64) {
+	if p == nil {
+		return
+	}
+	if p.literal != nil {
+		result = p.literal.literal
+	} else if p.operator != nil {
+		for i, op := range p.operator.operands {
+			value := calc(op)
+			switch p.operator.typeID {
+			case 0:
+				result += value
+			case 1:
+				if i == 0 {
+					result = value
+				} else {
+					result *= value
+				}
+			case 2:
+				if i == 0 {
+					result = value
+				} else if value < result {
+					result = value
+				}
+			case 3:
+				if i == 0 {
+					result = value
+				} else if value > result {
+					result = value
+				}
+			case 5:
+				if i == 0 {
+					result = value
+				} else {
+					if result > value {
+						result = 1
+					} else {
+						result = 0
+					}
+					break
+				}
+			case 6:
+				if i == 0 {
+					result = value
+				} else {
+					if result < value {
+						result = 1
+					} else {
+						result = 0
+					}
+					break
+				}
+			case 7:
+				if i == 0 {
+					result = value
+				} else {
+					if result == value {
+						result = 1
+					} else {
+						result = 0
+					}
+					break
+				}
+			}
 		}
 	}
 	return
 }
 
 func main() {
-	file, err := os.Open("input.txt")
+	part := 1
+	if len(os.Args) > 0 {
+		if p, err := strconv.Atoi(os.Args[1]); err != nil {
+			log.Fatal(err)
+		} else {
+			part = p
+		}
+	}
+
+	file, err := os.Open("sample2.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	sum := int64(0)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if len(line) == 0 {
 			continue
 		}
-		trans := hexToBin(line)
-		packet, _ := parsePacket(trans, 0)
-		s := calcVersionSums(&packet)
-		sum += s
+		packet := parsePacket(hexToBin(line), new(int))
+		if part == 1 {
+			println(sumVersions(packet))
+		} else {
+			println(calc(packet))
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	println(sum)
 }
