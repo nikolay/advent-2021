@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -190,16 +191,21 @@ func calc(p *Packet) (result int) {
 	return
 }
 
-func main() {
-	part := 1
+var part int
+
+func init() {
 	if len(os.Args) > 0 {
 		if p, err := strconv.Atoi(os.Args[1]); err != nil {
 			log.Fatal(err)
+		} else if p < 1 || p > 2 {
+			log.Fatal(errors.New(fmt.Sprint("invalid part: %v", p)))
 		} else {
 			part = p
 		}
 	}
+}
 
+func main() {
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
