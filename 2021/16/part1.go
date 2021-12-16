@@ -10,29 +10,29 @@ import (
 )
 
 func hexToBin(s string) (result string) {
-	tans := map[rune]string{
+	trans := map[rune]string{
 		'0': "0000", '1': "0001", '2': "0010", '3': "0011",
 		'4': "0100", '5': "0101", '6': "0110", '7': "0111",
 		'8': "1000", '9': "1001", 'A': "1010", 'B': "1011",
 		'C': "1100", 'D': "1101", 'E': "1110", 'F': "1111",
 	}
 	for _, r := range s {
-		result += tans[r]
+		result += trans[r]
 	}
 	return
 }
 
 type Literal struct {
-	value int64
+	value int
 }
 
 type Operator struct {
-	typeID   int64
+	typeID   int
 	operands []*Packet
 }
 
 type Packet struct {
-	version  int64
+	version  int
 	literal  *Literal
 	operator *Operator
 }
@@ -41,6 +41,18 @@ func chomp(s string, pos *int, size int) string {
 	i := *pos
 	(*pos) += size
 	return s[i:*pos]
+}
+
+func parseNumber(s string) int {
+	number, err := strconv.ParseInt(s, 2, 64)
+	if err != nil {
+		return -1
+	}
+	return int(number)
+}
+
+func chompNumber(s string, pos *int, size int) int {
+	return parseNumber(chomp(s, pos, size))
 }
 
 func parseLiteral(s string, pos *int) *Literal {
@@ -52,21 +64,20 @@ func parseLiteral(s string, pos *int) *Literal {
 			break
 		}
 	}
-	number, _ := strconv.ParseInt(bits, 2, 64)
-	return &Literal{number}
+	return &Literal{parseNumber(bits)}
 }
 
-func parseOperator(s string, pos *int, typeID int64) *Operator {
+func parseOperator(s string, pos *int, typeID int) *Operator {
 	operator := Operator{typeID, nil}
 	if chomp(s, pos, 1) == "0" {
-		totalLength, _ := strconv.ParseInt(chomp(s, pos, 15), 2, 64)
-		endPos := *pos + int(totalLength)
+		totalLength := chompNumber(s, pos, 15)
+		endPos := *pos + totalLength
 		operator.operands = make([]*Packet, 0)
 		for *pos < endPos {
 			operator.operands = append(operator.operands, parsePacket(s, pos))
 		}
 	} else {
-		numberOfSubpackets, _ := strconv.ParseInt(chomp(s, pos, 11), 2, 64)
+		numberOfSubpackets := chompNumber(s, pos, 11)
 		operator.operands = make([]*Packet, numberOfSubpackets)
 		for i := range operator.operands {
 			operator.operands[i] = parsePacket(s, pos)
@@ -76,10 +87,11 @@ func parseOperator(s string, pos *int, typeID int64) *Operator {
 }
 
 func parsePacket(s string, pos *int) *Packet {
+	const LITERAL = 4
 	packet := Packet{}
-	packet.version, _ = strconv.ParseInt(chomp(s, pos, 3), 2, 64)
-	typeID, _ := strconv.ParseInt(chomp(s, pos, 3), 2, 64)
-	if typeID == 4 {
+	packet.version = chompNumber(s, pos, 3)
+	typeID := chompNumber(s, pos, 3)
+	if typeID == LITERAL {
 		packet.literal = parseLiteral(s, pos)
 	} else {
 		packet.operator = parseOperator(s, pos, typeID)
@@ -87,50 +99,59 @@ func parsePacket(s string, pos *int) *Packet {
 	return &packet
 }
 
-func sumVersions(p *Packet) (result int64) {
+func calcVersionSum(p *Packet) (result int) {
 	if p == nil {
 		return
 	}
 	result = p.version
 	if p.operator != nil {
 		for _, op := range p.operator.operands {
-			result += sumVersions(op)
+			result += calcVersionSum(op)
 		}
 	}
 	return
 }
 
-func calc(p *Packet) (result int64) {
+func calc(p *Packet) (result int) {
+	const (
+		SUM          = 0
+		PRODUCT      = 1
+		MINIMUM      = 2
+		MAXIMUM      = 3
+		GREATER_THAN = 5
+		LESS_THAN    = 6
+		EQUAL        = 7
+	)
 	if p == nil {
 		return
 	}
 	if p.literal != nil {
 		result = p.literal.value
 	} else if p.operator != nil {
-		for i, op := range p.operator.operands {
-			value := calc(op)
+		for i, operand := range p.operator.operands {
+			value := calc(operand)
 			switch p.operator.typeID {
-			case 0:
+			case SUM:
 				result += value
-			case 1:
+			case PRODUCT:
 				if i == 0 {
 					result = value
 				} else {
 					result *= value
 				}
-			case 2:
+			case MINIMUM:
 				if i == 0 {
 					result = value
 				} else if value < result {
 					result = value
 				}
-			case 3:
+			case MAXIMUM:
 				if i == 0 {
 					result = value
 				} else if value > result {
 					result = value
 				}
-			case 5:
+			case GREATER_THAN:
 				if i == 0 {
 					result = value
 				} else {
@@ -141,7 +162,7 @@ func calc(p *Packet) (result int64) {
 					}
 					break
 				}
-			case 6:
+			case LESS_THAN:
 				if i == 0 {
 					result = value
 				} else {
@@ -152,7 +173,7 @@ func calc(p *Packet) (result int64) {
 					}
 					break
 				}
-			case 7:
+			case EQUAL:
 				if i == 0 {
 					result = value
 				} else {
@@ -179,7 +200,7 @@ func main() {
 		}
 	}
 
-	file, err := os.Open("sample2.txt")
+	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -191,10 +212,10 @@ func main() {
 		if len(line) == 0 {
 			continue
 		}
-		var result int64
+		var result int
 		packet := parsePacket(hexToBin(line), new(int))
 		if part == 1 {
-			result = sumVersions(packet)
+			result = calcVersionSum(packet)
 		} else {
 			result = calc(packet)
 		}
