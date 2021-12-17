@@ -52,7 +52,7 @@ func check(vx, vy, x1, y1, x2, y2 int) int {
 	}
 }
 
-func solve(x1, y1, x2, y2 int) (highestPeak, peaks int) {
+func solve(x1, y1, x2, y2 int) (highestPeak, hits int) {
 	highestPeak = math.MinInt
 	startX, endX := min(0, x2), max(0, x2)
 	startY, endY := min(-y1, y1), max(y1, -y1)
@@ -60,7 +60,7 @@ func solve(x1, y1, x2, y2 int) (highestPeak, peaks int) {
 		for vy := startY; vy <= endY; vy++ {
 			peak := check(vx, vy, x1, y1, x2, y2)
 			if peak != math.MinInt {
-				peaks++
+				hits++
 			}
 			if peak > highestPeak {
 				highestPeak = peak
@@ -89,9 +89,9 @@ func main() {
 		x2, _ := strconv.Atoi(matches[2])
 		y1, _ := strconv.Atoi(matches[3])
 		y2, _ := strconv.Atoi(matches[4])
-		highestPeak, peaks := solve(x1, y1, x2, y2)
+		highestPeak, hits := solve(x1, y1, x2, y2)
 		fmt.Println("Part 1", "=", highestPeak)
-		fmt.Println("Part 2", "=", peaks)
+		fmt.Println("Part 2", "=", hits)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
