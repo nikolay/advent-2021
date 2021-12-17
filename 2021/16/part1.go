@@ -198,7 +198,7 @@ func init() {
 		if p, err := strconv.Atoi(os.Args[1]); err != nil {
 			log.Fatal(err)
 		} else if p < 1 || p > 2 {
-			log.Fatal(errors.New(fmt.Sprint("invalid part: %v", p)))
+			log.Fatal(errors.New(fmt.Sprintf("invalid part: %v", p)))
 		} else {
 			part = p
 		}
