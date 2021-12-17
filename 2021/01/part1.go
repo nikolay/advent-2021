@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 )
@@ -15,15 +16,12 @@ func main() {
 	}
 	defer file.Close()
 
-	last := -1
+	last := math.MinInt
 	count := 0
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		num, err := strconv.Atoi(scanner.Text())
-		if err != nil {
-			log.Fatal(err)
-		}
-		if last != -1 && num > last {
+		num, _ := strconv.Atoi(scanner.Text())
+		if last != math.MinInt && num > last {
 			count++
 		}
 		last = num

@@ -27,11 +27,8 @@ func main() {
 		if len(matches) == 0 {
 			log.Fatal(errors.New(fmt.Sprintf("invalid command: %v", cmd)))
 		}
-		parameter, err := strconv.Atoi(matches[2])
-		if err != nil {
-			log.Fatal(err)
-		}
-		switch verb := matches[1]; verb {
+		parameter, _ := strconv.Atoi(matches[2])
+		switch matches[1] {
 		case "forward":
 			x += parameter
 			depth += aim * parameter

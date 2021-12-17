@@ -17,19 +17,16 @@ func main() {
 
 	count := uint(0)
 	freq := make([]uint, 0, 64)
-	bitSize := int(0)
+	bitsize := int(0)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		bits := scanner.Text()
-		if bitSize == 0 {
-			bitSize = len(bits)
-			freq = freq[0:bitSize]
+		if bitsize == 0 {
+			bitsize = len(bits)
+			freq = freq[0:bitsize]
 		}
-		decimal, err := strconv.ParseUint(bits, 2, bitSize)
-		if err != nil {
-			log.Fatal(err)
-		}
-		for i := 0; i < bitSize; i++ {
+		decimal, _ := strconv.ParseUint(bits, 2, bitsize)
+		for i := 0; i < bitsize; i++ {
 			if decimal&(1<<i) != 0 {
 				freq[i]++
 			}
@@ -40,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 	gamma, epsilon := 0, 0
-	for i := 0; i < bitSize; i++ {
+	for i := 0; i < bitsize; i++ {
 		if freq[i]<<1 > count {
 			gamma |= 1 << i
 		} else {

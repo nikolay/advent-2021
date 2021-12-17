@@ -9,13 +9,13 @@ import (
 )
 
 func calcRisk(prev, curr, next []rune) (result int) {
-	for i, c := range curr {
-		up := prev == nil || prev[i] > c
-		left := i == 0 || curr[i-1] > c
-		right := i == len(curr)-1 || curr[i+1] > c
-		down := next == nil || next[i] > c
+	for i, r := range curr {
+		up := prev == nil || prev[i] > r
+		left := i == 0 || curr[i-1] > r
+		right := i == len(curr)-1 || curr[i+1] > r
+		down := next == nil || next[i] > r
 		if up && left && right && down {
-			result += int(c-'0') + 1
+			result += int(r-'0') + 1
 		}
 	}
 	return

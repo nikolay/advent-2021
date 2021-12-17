@@ -74,8 +74,8 @@ func main() {
 			continue
 		}
 		digits := make([]int, 0, len(line))
-		for _, c := range []rune(line) {
-			digits = append(digits, int(c-'0'))
+		for _, r := range []rune(line) {
+			digits = append(digits, int(r-'0'))
 		}
 		matrix = append(matrix, digits)
 	}

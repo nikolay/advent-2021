@@ -78,6 +78,7 @@ func main() {
 	defer file.Close()
 
 	r := regexp.MustCompile(`^target area: x=([-]?\d+)..([-]?\d+), y=([-]?\d+)..([-]?\d+)$`)
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())

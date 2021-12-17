@@ -50,10 +50,7 @@ func scanCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
 				return nil, 0, errors.New(fmt.Sprintf("invalid card line: %v", line))
 			}
 			for j := 0; j < width; j++ {
-				num, err := strconv.Atoi(parts[j])
-				if err != nil {
-					return nil, 0, err
-				}
+				num, _ := strconv.Atoi(parts[j])
 				result[num] = Coord{i, j}
 				sum += num
 			}
@@ -75,25 +72,28 @@ func scanDraws(scanner *bufio.Scanner) (result []int, err error) {
 	}
 	parts := strings.Split(line, ",")
 	for _, p := range parts {
-		num, err := strconv.Atoi(strings.TrimSpace(p))
-		if err != nil {
-			return nil, err
-		}
+		num, _ := strconv.Atoi(strings.TrimSpace(p))
 		result = append(result, num)
 	}
 	return
 }
 
-func main() {
-	var firstBingo bool
-	switch os.Args[1] {
-	case "1":
-		firstBingo = true
-	case "2":
-		firstBingo = false
-	default:
-		log.Fatal(errors.New(fmt.Sprintf("unknown part number %v", os.Args[1])))
+var part int
+
+func init() {
+	if len(os.Args) > 0 {
+		if p, err := strconv.Atoi(os.Args[1]); err != nil {
+			log.Fatal(err)
+		} else if p < 1 || p > 2 {
+			log.Fatal(errors.New(fmt.Sprintf("invalid part: %v", p)))
+		} else {
+			part = p
+		}
 	}
+}
+
+func main() {
+	firstBingo := part == 1
 
 	file, err := os.Open("input.txt")
 	if err != nil {

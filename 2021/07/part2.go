@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -17,7 +18,6 @@ func abs(x int) int {
 }
 
 func calcFuel(positions []int, position int) (fuel int) {
-	fuel = 0
 	for _, p := range positions {
 		distance := abs(p - position)
 		fuel += distance * (distance + 1) / 2
@@ -47,17 +47,14 @@ func main() {
 	parts := strings.Split(line, ",")
 	positions := make([]int, 0, len(parts))
 	for _, p := range parts {
-		num, err := strconv.Atoi(strings.TrimSpace(p))
-		if err != nil {
-			log.Fatal(err)
-		}
+		num, _ := strconv.Atoi(strings.TrimSpace(p))
 		positions = append(positions, num)
 	}
 
-	minFuel := -1
+	minFuel := math.MinInt
 	for _, p := range positions {
 		fuel := calcFuel(positions, p)
-		if minFuel == -1 || fuel < minFuel {
+		if minFuel == math.MinInt || fuel < minFuel {
 			minFuel = fuel
 		}
 	}

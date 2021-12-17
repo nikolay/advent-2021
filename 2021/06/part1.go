@@ -10,16 +10,22 @@ import (
 	"strings"
 )
 
-func main() {
-	var days int
-	switch os.Args[1] {
-	case "1":
-		days = 80
-	case "2":
-		days = 256
-	default:
-		log.Fatal(errors.New(fmt.Sprintf("unknown part number %v", os.Args[1])))
+var part int
+
+func init() {
+	if len(os.Args) > 0 {
+		if p, err := strconv.Atoi(os.Args[1]); err != nil {
+			log.Fatal(err)
+		} else if p < 1 || p > 2 {
+			log.Fatal(errors.New(fmt.Sprintf("invalid part: %v", p)))
+		} else {
+			part = p
+		}
 	}
+}
+
+func main() {
+	days := [2]int{80, 256}[part-1]
 
 	file, err := os.Open("input.txt")
 	if err != nil {
@@ -42,10 +48,7 @@ func main() {
 	parts := strings.Split(line, ",")
 	fish := make(map[int]int)
 	for _, p := range parts {
-		num, err := strconv.Atoi(strings.TrimSpace(p))
-		if err != nil {
-			log.Fatal(err)
-		}
+		num, _ := strconv.Atoi(strings.TrimSpace(p))
 		fish[num] += 1
 	}
 

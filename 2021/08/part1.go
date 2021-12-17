@@ -36,7 +36,7 @@ func main() {
 			case 7:
 				d = 8
 			}
-			if d < 0 {
+			if d >= 0 {
 				count++
 			}
 		}

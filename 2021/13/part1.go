@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -69,14 +70,19 @@ func main() {
 		}
 		matrix[y][x] = true
 	}
+
+	r := regexp.MustCompile(`^fold along (x|y)=(\d+)$`)
+
 	folds := 0
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if len(line) == 0 {
 			break
 		}
-		if strings.HasPrefix(line, "fold along y=") {
-			foldY, _ := strconv.Atoi(strings.TrimPrefix(line, "fold along y="))
+		matches := r.FindStringSubmatch(line)
+		switch matches[1] {
+		case "y":
+			foldY, _ := strconv.Atoi(matches[2])
 			newHeight := max(foldY, height-1-foldY)
 			newMatrix := expandMatrix([][]bool{}, width, newHeight)
 			for y := 0; y < newHeight; y++ {
@@ -87,14 +93,12 @@ func main() {
 			}
 			height = newHeight
 			matrix = newMatrix
-		}
-		if strings.HasPrefix(line, "fold along x=") {
-			foldX, _ := strconv.Atoi(strings.TrimPrefix(line, "fold along x="))
+		case "x":
+			foldX, _ := strconv.Atoi(matches[2])
 			newWidth := max(foldX, width-1-foldX)
 			newMatrix := expandMatrix([][]bool{}, newWidth, height)
 			for x := 0; x < newWidth; x++ {
-				leftX := foldX - (x + 1)
-				rightX := foldX + (x + 1)
+				leftX, rightX := foldX-(x+1), foldX+(x+1)
 				for y := 0; y < height; y++ {
 					newMatrix[y][newWidth-(x+1)] = leftX >= 0 && matrix[y][leftX] || rightX < width && matrix[y][rightX]
 				}

@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"container/heap"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -119,16 +120,21 @@ func transform(matrix [][]int, mx, my int) [][]int {
 	return newMatrix
 }
 
-func main() {
-	part := 1
+var part int
+
+func init() {
 	if len(os.Args) > 0 {
 		if p, err := strconv.Atoi(os.Args[1]); err != nil {
 			log.Fatal(err)
+		} else if p < 1 || p > 2 {
+			log.Fatal(errors.New(fmt.Sprintf("invalid part: %v", p)))
 		} else {
 			part = p
 		}
 	}
+}
 
+func main() {
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -143,8 +149,8 @@ func main() {
 			continue
 		}
 		row := make([]int, 0, len(line))
-		for _, r := range line {
-			risk, _ := strconv.Atoi(string(r))
+		for _, b := range line {
+			risk := int(b - '0')
 			row = append(row, risk)
 		}
 		risks = append(risks, row)

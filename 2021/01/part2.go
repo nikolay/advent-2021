@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 )
@@ -17,15 +18,12 @@ func main() {
 	}
 	defer file.Close()
 
-	last := -1
+	last := math.MinInt
 	count := 0
 	buffer := make([]int, 0, bufferSize)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		num, err := strconv.Atoi(scanner.Text())
-		if err != nil {
-			log.Fatal(err)
-		}
+		num, _ := strconv.Atoi(scanner.Text())
 		buffer = append(buffer, num)
 		if len(buffer) < bufferSize {
 			continue
@@ -35,7 +33,7 @@ func main() {
 			sum += v
 		}
 		buffer = buffer[1:]
-		if last != -1 && sum > last {
+		if last != math.MinInt && sum > last {
 			count++
 		}
 		last = sum
