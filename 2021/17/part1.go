@@ -55,7 +55,7 @@ func check(vx, vy, x1, y1, x2, y2 int) int {
 func solve(x1, y1, x2, y2 int) (highestPeak, hits int) {
 	highestPeak = math.MinInt
 	startX, endX := min(0, x2), max(0, x2)
-	startY, endY := min(-y1, y1), max(y1, -y1)
+	startY, endY := min(-y1, y1), max(-y1, y1)
 	for vx := startX; vx <= endX; vx++ {
 		for vy := startY; vy <= endY; vy++ {
 			peak := check(vx, vy, x1, y1, x2, y2)
