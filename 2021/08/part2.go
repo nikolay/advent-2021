@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2021
+ *   All rights reserved.
+ */
 package main
 
 import (
