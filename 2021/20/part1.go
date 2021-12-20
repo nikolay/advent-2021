@@ -12,13 +12,26 @@ import (
 	"strings"
 )
 
-type Algo [512]bool
+const (
+	enhancementsPart1 = 2
+	enhancementsPart2 = 50
+)
+
+const (
+	lightPixel = '#'
+	darkPixel  = '.'
+)
 
 type Point struct {
 	x, y int
 }
 
-func getBounds(pixels map[Point]bool) (minX, maxX, minY, maxY int) {
+type (
+	Algo  [512]bool
+	Image map[Point]bool
+)
+
+func getBounds(pixels Image) (minX, maxX, minY, maxY int) {
 	first := true
 	for pt, flag := range pixels {
 		if flag {
@@ -43,29 +56,31 @@ func getBounds(pixels map[Point]bool) (minX, maxX, minY, maxY int) {
 	return
 }
 
-func bitmap(pixels map[Point]bool, x0, y0 int, minX, maxX, minY, maxY int, void bool) (result uint) {
+func bitmap(pixels Image, x0, y0 int, minX, maxX, minY, maxY int, void bool) (result uint) {
+	var pixel bool
 	for dy := -1; dy <= 1; dy++ {
 		y := y0 + dy
 		for dx := -1; dx <= 1; dx++ {
 			x := x0 + dx
-			pixel := false
 			if x < minX || x > maxX || y < minY || y > maxY {
 				pixel = void
 			} else {
 				if v, ok := pixels[Point{x, y}]; ok {
 					pixel = v
+				} else {
+					pixel = false
 				}
 			}
 			result <<= 1
 			if pixel {
-				result |= 1
+				result |= 0b000000001
 			}
 		}
 	}
 	return
 }
 
-func enhance(pixels map[Point]bool, algo Algo, void bool) (newPixels map[Point]bool, result int) {
+func enhance(pixels Image, algo Algo, void bool) (newPixels Image, result int) {
 	minX, maxX, minY, maxY := getBounds(pixels)
 	newPixels = make(map[Point]bool)
 	for y := minY - 1; y <= maxY+1; y++ {
@@ -91,10 +106,10 @@ func main() {
 	if scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		for i, r := range line {
-			algo[i] = r == '#'
+			algo[i] = r == lightPixel
 		}
 	}
-	pixels := make(map[Point]bool)
+	pixels := make(Image)
 	y := 0
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -102,7 +117,7 @@ func main() {
 			continue
 		}
 		for x, r := range line {
-			if r == '#' {
+			if r == lightPixel {
 				pixels[Point{x, y}] = true
 			}
 		}
@@ -113,18 +128,18 @@ func main() {
 	}
 
 	var result int
-	for i := 0; i < 50; i++ {
+	void := false
+	for i := 0; i < enhancementsPart2; i++ {
 		switch i {
-		case 2:
+		case enhancementsPart1:
 			fmt.Println("Part 1", "=", result)
 		}
-		var void bool
-		if i%2 == 1 {
-			void = algo[0]
-		} else {
-			void = false
-		}
 		pixels, result = enhance(pixels, algo, void)
+		if void {
+			void = algo[0b111111111]
+		} else {
+			void = algo[0b000000000]
+		}
 	}
 	fmt.Println("Part 2", "=", result)
 }
