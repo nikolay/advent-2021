@@ -276,11 +276,11 @@ func main() {
 			pair.Reduce()
 		}
 	}
-	if len(lines) == 1 {
-		pair.Reduce()
-	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
+	}
+	if len(lines) == 1 {
+		pair.Reduce()
 	}
 	fmt.Println("Part 1", "=", pair.CalcMagnitude())
 
