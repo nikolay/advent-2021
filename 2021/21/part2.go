@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+const winningScore = 21
+
 type Memory struct {
 	positions  [2]int
 	score      [2]int
@@ -49,7 +51,7 @@ func multiverse(positions [2]int, scores [2]int, multiplier uint64, turn byte, m
 			p := move(position, roll)
 			s := score + p
 			positions[turn], scores[turn] = p, s
-			if s >= 21 {
+			if s >= winningScore {
 				wins[turn] += multiplier * frequency
 				continue
 			}
