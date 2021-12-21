@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -22,27 +23,27 @@ type Coord struct {
 
 type Card map[int]Coord
 
-func hasBingo(bits uint64) bool {
-	maskRow := uint64(1)<<width - 1
-	maskCol := uint64(0)
-	for i := 0; i < height; i++ {
-		if bits&maskRow == maskRow {
+type Result struct {
+	colHits [width]int
+	rowHits [height]int
+}
+
+func hasBingo(result Result) bool {
+	for row := 0; row < height; row++ {
+		if result.rowHits[row] == width {
 			return true
 		}
-		maskRow <<= width
-		maskCol = maskCol<<width | 1
 	}
-	for j := 0; j < height; j++ {
-		if bits&maskCol == maskCol {
+	for col := 0; col < width; col++ {
+		if result.colHits[col] == height {
 			return true
 		}
-		maskCol <<= 1
 	}
 	return false
 }
 
-func scanCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
-	result, sum, err = make(Card), 0, nil
+func scanCard(scanner *bufio.Scanner) (card Card, sum int, err error) {
+	card, sum, err = make(Card), 0, nil
 	for i := 0; i < height; i++ {
 		if scanner.Scan() {
 			line := scanner.Text()
@@ -55,7 +56,7 @@ func scanCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
 			}
 			for j := 0; j < width; j++ {
 				num, _ := strconv.Atoi(parts[j])
-				result[num] = Coord{i, j}
+				card[num] = Coord{i, j}
 				sum += num
 			}
 		} else {
@@ -65,8 +66,8 @@ func scanCard(scanner *bufio.Scanner) (result Card, sum int, err error) {
 	return
 }
 
-func scanDraws(scanner *bufio.Scanner) (result []int, err error) {
-	result, err = make([]int, 0), nil
+func scanDraws(scanner *bufio.Scanner) (draws []int, err error) {
+	draws, err = make([]int, 0), nil
 	var line string
 	for scanner.Scan() {
 		line = strings.TrimSpace(scanner.Text())
@@ -77,7 +78,7 @@ func scanDraws(scanner *bufio.Scanner) (result []int, err error) {
 	parts := strings.Split(line, ",")
 	for _, p := range parts {
 		num, _ := strconv.Atoi(strings.TrimSpace(p))
-		result = append(result, num)
+		draws = append(draws, num)
 	}
 	return
 }
@@ -125,8 +126,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	score := -1
-	bits := make([]uint64, len(cards))
+	score := math.MinInt
+	results := make([]Result, len(cards))
 	bingo := make(map[int]bool)
 	for _, draw := range draws {
 		for j, card := range cards {
@@ -136,8 +137,9 @@ func main() {
 			coord, hit := card[draw]
 			if hit {
 				scores[j] -= draw
-				bits[j] |= uint64(1) << (coord.row*width + coord.col)
-				if hasBingo(bits[j]) {
+				results[j].rowHits[coord.row]++
+				results[j].colHits[coord.col]++
+				if hasBingo(results[j]) {
 					bingo[j] = true
 					if firstBingo || len(bingo) == len(cards) {
 						score = scores[j] * draw
@@ -145,10 +147,9 @@ func main() {
 				}
 			}
 		}
-		if score != -1 {
+		if score != math.MinInt {
 			break
 		}
 	}
-
 	fmt.Println(score)
 }
