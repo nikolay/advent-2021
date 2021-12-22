@@ -95,7 +95,7 @@ func main() {
 	}
 	defer file.Close()
 
-	r := regexp.MustCompile(`^(on|off) x=([-]?\d+)..([-]?\d+),y=([-]?\d+)..([-]?\d+),z=([-]?\d+)..([-]?\d+)$`)
+	cuboidRegexp := regexp.MustCompile(`^(on|off) x=([-]?\d+)..([-]?\d+),y=([-]?\d+)..([-]?\d+),z=([-]?\d+)..([-]?\d+)$`)
 
 	space := Space{}
 
@@ -105,7 +105,7 @@ func main() {
 		if len(line) == 0 {
 			continue
 		}
-		matches := r.FindStringSubmatch(line)
+		matches := cuboidRegexp.FindStringSubmatch(line)
 		if len(matches) > 0 {
 			state := false
 			if matches[1] == "on" {
